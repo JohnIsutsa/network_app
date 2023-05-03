@@ -18,18 +18,22 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text("Fancy Movies"),
-        centerTitle: true,
-      ),
-      body: ListView.builder(
-        itemCount: movies.length,
-        itemBuilder: (context, index) {
-          return Text("${movies[index].title}");
-        },
-      ),
-    );
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Text("Fancy Movies"),
+          centerTitle: true,
+        ),
+        body: ListView.separated(
+            itemBuilder: (BuildContext context, int position) {
+              // return Text("Fancy Movies");
+              return _movieItemView(movies[position]);
+            },
+            separatorBuilder: (BuildContext context, int position) {
+              return const Divider(
+                height: 10,
+              );
+            },
+            itemCount: movies.length));
   }
 
   @override
@@ -38,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  Future<void> _getData() async {
+  _getData() async {
     final dio = Dio();
     String url = 'http://www.omdbapi.com/?apikey=5130d83e&s=Batman&page=2';
     final response = await dio.get(url);
@@ -62,5 +66,50 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       setState(() {});
     }
+  }
+
+  Widget _movieItemView(MovieItem movieItem) {
+    return ListTile(
+      onTap: () {},
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Colors.white.withAlpha(100),
+      ),
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(5.0),
+        child: Image.network(
+          movieItem.poster,
+          fit: BoxFit.cover,
+          height: 80,
+          width: 60,
+        ),
+      ),
+      subtitle: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            movieItem.year,
+            style: TextStyle(color: Colors.black, fontSize: 16),
+          ),
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: Colors.red.withAlpha(50),
+            ),
+            child: Text(
+              movieItem.type.toUpperCase(),
+              style: TextStyle(color: Colors.black, fontSize: 12),
+            ),
+          ),
+        ],
+      ),
+      title: Text(
+        movieItem.title,
+        style: TextStyle(color: Colors.black, fontSize: 16),
+      ),
+    );
   }
 }
